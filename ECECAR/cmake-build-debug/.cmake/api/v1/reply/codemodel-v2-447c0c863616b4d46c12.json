@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ECECAR",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ECECAR::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ECECAR-Debug-32d82f4efaeb88d7b3cd.json",
+					"name" : "ECECAR",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/romai/Desktop/Le coin codage/Redoublement_S3-S4/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR/cmake-build-debug",
+		"source" : "C:/Users/romai/Desktop/Le coin codage/Redoublement_S3-S4/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
