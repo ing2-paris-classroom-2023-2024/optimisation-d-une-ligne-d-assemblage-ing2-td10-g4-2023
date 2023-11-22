@@ -3,4 +3,4 @@ project(ECECAR C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(ECECAR main.c Task.h)
+add_executable(ECECAR main.c Task.h Station.h)

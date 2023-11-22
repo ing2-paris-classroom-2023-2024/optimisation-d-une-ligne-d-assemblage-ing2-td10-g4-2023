@@ -166,7 +166,6 @@ int main() {
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
     ws = init_station("temps_cycle.txt");                   // Fonction de définition du temps par station
-    printf("Temps? %d", ws->tempsmax);
 
     ///CODE EXCLUSION
 
