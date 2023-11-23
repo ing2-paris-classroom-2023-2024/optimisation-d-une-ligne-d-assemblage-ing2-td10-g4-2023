@@ -3,3 +3,8 @@
 /ECECAR/cmake-build-debug/
 cmake-build-debug
 *.log
+ECECAR/cmake-build-debug/Testing/Temporary/LastTest.log
+*.txt
+/ECECAR/cmake-build-debug/.cmake/
+/ECECAR/cmake-build-debug/Testing/
+/ECECAR/cmake-build-debug/CMakeFiles/
