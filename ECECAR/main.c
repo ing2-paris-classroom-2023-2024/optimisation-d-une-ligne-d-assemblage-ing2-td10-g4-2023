@@ -151,12 +151,12 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
 stat* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
 
-    stat* ws = (stat*) malloc(sizeof(stat));
+    chain* chaine = (chain*) malloc(sizeof(chain));
     FILE *pf = fopen(file_name,"r");                        //Ouvre le fichier sous le nom pf
-    fscanf(pf,"%d",&ws->tempsmax);
+    fscanf(pf,"%d",&chaine->tempsmax);
     fclose(pf);
 
-    return ws;
+    return chaine;
 }
 
 int main() {
