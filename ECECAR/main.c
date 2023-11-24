@@ -83,7 +83,7 @@ int main() {
     init_exclu("Exclusion.txt", tabtask);
 
     ///CODE EXCLUSION
-
+//hypothese : utilisation d'algorithme de coloration (welsh powell ?)
     ///CODE PRECEDENCE
 
     free(tabtask);
