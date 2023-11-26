@@ -159,6 +159,53 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return ws;
 }
 
+void tri_precedence (stat* wagon, taches* listetaches) {
+    taches *listetemp = (taches *) malloc(sizeof(taches) * listetaches->nbtaches);
+    int compteurtaches = 0;
+    int compteurstations = 0;
+    float tempsrestant;
+    while (compteurtaches < listetaches->nbtaches) {            ///TANT QUE PAS TOUTES TACHE COLOREES
+        for (int i = 0; i < listetaches->nbtaches; i++) {
+            if (listetaches->taches->nbpred == 0) {                         /// SI PAS DE PRED
+                listetemp->taches[compteurtaches] = listetaches->taches[i];
+                compteurtaches++;
+            } else {                                                                     /// SI PRED
+                for (int j = 0; j < listetaches->taches[i].nbpred; j++) {                       /// POUR CHAQUE PRED
+                    for (int l = 0; l < listetaches->nbtaches; l++) {
+                        if (listetaches->taches[i].pred[j].ID == listetaches->taches[l].ID) {
+                            if (listetaches->taches[l].marque != 2) {
+                                break;
+                            }
+                            if(listetaches->taches[i].nbpred-1 == j)
+                            {
+                                listetaches->taches[i].marque = 1;
+                                listetemp->taches[compteurtaches] = listetaches->taches[i];
+                                compteurtaches++;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        while (compteurstations < compteurtaches) {
+            tempsrestant = wagon->tempsmax - wagon->tempsactuel;
+            for (int i = 0; i < compteurtaches; i++) {
+                if (listetemp->taches[i].temps <= tempsrestant) {
+                    for (int j = 0; j < listetemp->taches[i].nbpred; j++) {
+                        if (listetemp->taches[i].pred[j].marque != 1) {
+                            break;
+                        }
+                        else {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 int main() {
     stat* ws;
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
@@ -183,8 +230,8 @@ int main() {
      * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
      * */
 
+    tri_precedence (ws, tabtask);
+
     free(tabtask);
     return 0;
 }
-
-/// test pour véifier si github fonctionne correctement

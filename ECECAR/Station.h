@@ -5,6 +5,7 @@
 typedef struct Station{
     int rang;
     int tempsmax;
+    float tempsactuel;
     struct Task* tabstat;
 }stat;
 
