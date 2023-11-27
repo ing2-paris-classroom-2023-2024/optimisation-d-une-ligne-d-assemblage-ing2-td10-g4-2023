@@ -119,6 +119,7 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
         for (int i = 0; i < g->nbtaches; i++) {
             g->taches[i].exclu = (task *) malloc(sizeof(task) * g->nbtaches);
             g->taches[i].couleur = 0;                               // Initialise les couleurs des taches (0 = non colorée)
+
         }
         for (int i = 0; i < nblignes; i++)                                      //Rempli un tableau de predecesseur
         {
@@ -160,22 +161,8 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
-int main() {
-    stat* ws;
-    taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
-    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
-    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
-    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
-    ws = init_station("temps_cycle.txt");                   // Fonction de définition du temps par station
-
-    ///CODE EXCLUSION
-
-    /*
-     * Cherchez à répondre à la contrainte d'exclusion,
-     * sans prendre en compte les autres contraintes
-     * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
-     * */
-
+void exclusion()
+{
     int couleur = 1;
     int *listetemp = (int*)malloc(sizeof(int));
     int nbtemp = 0;
@@ -219,6 +206,25 @@ int main() {
         }
         couleur++;
     }
+}
+
+int main() {
+    stat* ws;
+    taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
+    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
+    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
+    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
+    ws = init_station("temps_cycle.txt");                   // Fonction de définition du temps par station
+
+    ///CODE EXCLUSION
+
+    /*
+     * Cherchez à répondre à la contrainte d'exclusion,
+     * sans prendre en compte les autres contraintes
+     * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
+     * */
+
+    exclusion();
 
     ///CODE PRECEDENCE / TEMPS
 
