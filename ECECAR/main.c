@@ -128,8 +128,8 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
                     for (int k = 0; k < g->nbtaches; k++) {
                         if (g->taches[k].ID == op2)                      //Récupère l'index de la tache correspondant à "op2" dans le tableau de taches
                         {
-                            g->taches[j].exclu[g->taches[j].nbexclu] = g->taches[k];      //Met la tache "op1" dans le tableau d'exclusion de "op2"
-                            g->taches[k].exclu[g->taches[j].nbexclu] = g->taches[j];      //Met la tache "op2" dans le tableau d'exclusion de "op1"
+                            g->taches[j].exclu[g->taches[j].nbexclu] = g->taches[k];      //Met la tache "op2" dans le tableau d'exclusion de "op1"
+                            g->taches[k].exclu[g->taches[k].nbexclu] = g->taches[j];      //Met la tache "op1" dans le tableau d'exclusion de "op2"
                             g->taches[j].nbexclu++;                                    //Ajoute 1 au nombre d'exclus de "op1"
                             g->taches[k].nbexclu++;                                   //Ajoute 1 au nombre d'exclus de "op2"
                         }
