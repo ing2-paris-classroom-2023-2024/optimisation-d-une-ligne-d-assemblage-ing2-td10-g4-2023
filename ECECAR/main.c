@@ -56,6 +56,7 @@ void init_taches(char* file_name, taches* g)         ///Fonction de lecture de f
             g->taches[i].marque = 0;                                    //Initialise la tache en "non marquée"
             g->taches[i].nbpred = 0;                                   //Initialise le nombre de predecesseurs de la tache à "0"
             g->taches[i].nbexclu = 0;                                 //Initialise le nombre de taches exclues de la tache à "0"
+            g->taches[i].couleur = 0;
         }
         fclose(pf);                                             //Ferme le fichier
     }
@@ -148,7 +149,7 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
     }
 }
 
-stat* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
+chain* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
 
     chain* chaine = (chain*) malloc(sizeof(chain));
@@ -159,47 +160,53 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
-void exclusion()
+void exclusion(taches* tabtask)
 {
-    int couleur = 1;
-    taches *listetemp = (taches *)malloc(sizeof(taches)*taches->nbtaches);
-    int nbtemp = 0;
-    int nbColorees = 0;
+    printf("----EXCLUSION-----\n");
+    int X, exclMax, nbColorees = 0, couleur = 1;
 
-    while(nbColorees != tabtask->nbtaches)
+    while(nbColorees != tabtask->nbtaches)          ///Tant que toutes les taches pas colorées
     {
-        for(int i = 0; i < tabtask->nbtaches; i++){
-            if (tabtask->taches[i].couleur == 0){
-                int X = 0;
-                int exclMax = 0;
-                for(int j = 0; j < tabtask->nbtaches; j++){
-                    if(tabtask->taches[j].nbexclu > exclMax && tabtask->taches[j].couleur == 0){
-                        exclMax = tabtask->taches[j].nbexclu;
-                        X = j;
+        X = 0;
+        exclMax = INT_MIN;
+        for(int i = 0; i < tabtask->nbtaches; i++) {         ///Boucle sur toutes les taches pour chercher le maximum d'exclu
+            if (tabtask->taches[i].nbexclu > exclMax && tabtask->taches[i].couleur == 0) {        //Cherche le maximum d'exclusion
+                exclMax = tabtask->taches[i].nbexclu;
+                X = i;
+            }
+        }
+        printf("CHECK 1 exclmax %d\n",exclMax);
+        tabtask->taches[X].couleur = couleur;
+        nbColorees++;
+        for(int i = 0; i < tabtask->nbtaches; i++) {             ///Boucles sur toutes les tâches
+            if (tabtask->taches[i].couleur == 0) {           //Si la tache n'est pas colorée
+                for(int j=0;j<tabtask->taches[X].nbexclu; j++)      ///Boucle sur les exclus de X
+                {
+                    if(tabtask->taches[X].exclu[j].ID == tabtask->taches[i].ID)         // Si on trouve un seul exclu on arrête la boucle sur les exclus
+                    {
+                        printf("Je BREAAAAAK \n");
+                        break;
                     }
-                    tabtask->taches[X].couleur = couleur;
-                    listetemp[nbtemp] = tabtask->taches[X];
-                    nbtemp++;
-                    nbColorees++;
-                    for(int k = 0; k < tabtask->nbtaches; k++){
-                        if(tabtask->taches[k].couleur == 0){
-                            for(int l = 0; l < tabtask->nbtaches; l++){
-                                for(int m = 0; m < tabtask->taches[k].nbexclu; m++){
-                                    if(tabtask->taches[k].exclu[m].ID == listetemp[l])
-                                        break;
-                                    if(l == nbtemp){
-                                        tabtask->taches[k].couleur = couleur;
-                                        listetemp[nbtemp] = tabtask->taches[k];
-                                        nbtemp++;
-                                        nbColorees++;
+                    if( j == tabtask->taches[X].nbexclu-1)          //Si on est arrivé jusqu'ici, alors la tache n'est pas exclue
+                    {
+                        tabtask->taches[i].couleur = couleur;
+                        nbColorees++;
+                        /*for (int k = 0; k < tabtask->nbtaches; k++) {
+                            if (tabtask->taches[k].couleur == 0) {
+                                for (int l = 0; l < tabtask->nbtaches; l++) {
+                                    for (int m = 0; m < tabtask->taches[k].nbexclu; m++) {
+                                        if (tabtask->taches[k].exclu[m].ID == listetemp->taches[l].ID)
+                                            break;
+                                        if (l == nbtemp) {
+                                            tabtask->taches[k].couleur = couleur;
+                                            nbColorees++;
+                                        }
                                     }
                                 }
                             }
-                        }
+                        }*/
                     }
-
                 }
-
             }
         }
         couleur++;
@@ -207,7 +214,7 @@ void exclusion()
 }
 
 int main() {
-    stat* ws;
+    chain* ws;
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
@@ -221,6 +228,19 @@ int main() {
      * sans prendre en compte les autres contraintes
      * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
      * */
+
+    for (int i = 0; i < tabtask->nbtaches; i++) {
+        printf("%d ) Je suis %d avec %d exclus: \n",i,tabtask->taches[i].ID,tabtask->taches[i].nbexclu);
+        for (int j = 0; j < tabtask->taches[i].nbexclu; ++j) {
+            printf("%d ) Exclu : %d \n",j,tabtask->taches[i].exclu[j].ID);
+        }
+    }
+
+    exclusion(tabtask);
+
+    for (int i = 0; i < tabtask->nbtaches; i++) {
+        printf("%d ) Je suis %d de couleur %d\n",i,tabtask->taches[i].ID,tabtask->taches[i].couleur);
+    }
 
     ///CODE PRECEDENCE / TEMPS
 
