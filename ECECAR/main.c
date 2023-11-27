@@ -156,11 +156,27 @@ chain* init_station(char* file_name)                             ///Fonction de 
     return chaine;
 }
 
-
+void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
+{
+    int trie=0;                                                 //Variable d'arrêt de boucle
+    while(trie==0)                                              //Boucle tant que la liste n'est pas triée
+    {
+        trie=1;
+        for(int i=0;i<tabtask->nbtaches-1;i++)                          //Boucle sur le nombre d'arêtes
+        {
+            if(tabtask->taches[i].nbexclu>tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
+            {
+                trie=0;                                         //On signale que la liste n'est pas triée
+                task inter=tabtask->taches[i];                     //Tache temporaire
+                tabtask->taches[i]=tabtask->taches[i+1];                //échange des positions des taches
+                tabtask->taches[i+1]=inter;
+            }
+        }
+    }
+}
 
 void exclusion(taches* tabtask)
 {
-    printf("----EXCLUSION-----\n");
     int X, exclMax, nbtemp =0, nbColorees = 0, couleur = 1;
     taches* listetemp = (taches*) malloc(sizeof(taches));
     listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
@@ -181,7 +197,6 @@ void exclusion(taches* tabtask)
         nbtemp++;
         for(int i = 0; i < tabtask->nbtaches; i++) {             ///Boucles sur toutes les tâches
             if (tabtask->taches[i].couleur == 0) {           //Si la tache n'est pas colorée
-                printf("  CHECK 2 ID %d, couleur %d\n",tabtask->taches[i].ID,couleur);
                 exclMax = 0;
                 for(int j=0;j<nbtemp; j++)      ///Boucle sur la liste temp
                 {
@@ -232,7 +247,7 @@ int main() {
             printf("%d ) Exclu : %d \n",j+1,tabtask->taches[i].exclu[j].ID);
         }
     }
-
+    
     exclusion(tabtask);
 
     for (int i = 0; i < tabtask->nbtaches; i++) {
