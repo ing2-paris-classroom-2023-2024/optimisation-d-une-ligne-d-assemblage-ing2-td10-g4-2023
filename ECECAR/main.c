@@ -91,8 +91,8 @@ void init_pred(char* file_name, taches *g)         ///Fonction de lecture de fic
                     {
                         if(g->taches[k].ID == op2)                //Récupère l'index de la tache correspondant à "op2" dans le tableau de taches
                         {
-                            g->taches[j].pred[g->taches[j].nbpred] = g->taches[k];      //Met la tache "op1" dans le tableau de predecesseur de "op2"
-                            g->taches[j].nbpred +=1;                                    //Ajoute 1 au nombre de predecesseur
+                            g->taches[k].pred[g->taches[k].nbpred] = g->taches[j];      //Met la tache "op1" dans le tableau de predecesseur de "op2"
+                            g->taches[k].nbpred +=1;                                    //Ajoute 1 au nombre de predecesseur
                         }
                     }
                 }
@@ -247,7 +247,15 @@ int main() {
             printf("%d ) Exclu : %d \n",j+1,tabtask->taches[i].exclu[j].ID);
         }
     }
-    
+
+    printf("---------------------------------------\n");
+
+    for (int i = 0; i < tabtask->nbtaches; i++) {
+        printf("%d ) Je suis %d avec %d predecesseur: \n",i,tabtask->taches[i].ID,tabtask->taches[i].nbpred);
+        for (int j = 0; j < tabtask->taches[i].nbpred; ++j) {
+            printf("%d ) Pred : %d \n",j+1,tabtask->taches[i].pred[j].ID);
+        }
+    }
     exclusion(tabtask);
 
     for (int i = 0; i < tabtask->nbtaches; i++) {
