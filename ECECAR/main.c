@@ -56,6 +56,7 @@ void init_taches(char* file_name, taches* g)         ///Fonction de lecture de f
             g->taches[i].marque = 0;                                    //Initialise la tache en "non marquée"
             g->taches[i].nbpred = 0;                                   //Initialise le nombre de predecesseurs de la tache à "0"
             g->taches[i].nbexclu = 0;                                 //Initialise le nombre de taches exclues de la tache à "0"
+            g->taches[i].couleur = 0;
         }
         fclose(pf);                                             //Ferme le fichier
     }
@@ -82,18 +83,16 @@ void init_pred(char* file_name, taches *g)         ///Fonction de lecture de fic
         {
             fscanf(pf,"%d",&op1);                         //Récupère les informations du fichier
             fscanf(pf,"%d",&op2);
-            for(int j=0; j<g->nbtaches; j++)                          //Boucle sur tous les sommets pour trouver l'index de "op2"
+            for(int j=0; j<g->nbtaches; j++)                          //Boucle sur tous les sommets pour trouver l'index de "op1"
             {
-
-                if(g->taches[j].ID == op2)                          //Index de "op2"
+                if(g->taches[j].ID == op1)                          //Index de "op1"
                 {
-
-                    for(int k=0; k<g->nbtaches; k++)               //Boucle sur tous les sommets pour trouver l'index de "op1"
+                    for(int k=0; k<g->nbtaches; k++)               //Boucle sur tous les sommets pour trouver l'index de "op2"
                     {
-                        if(g->taches[k].ID == op1)                //Récupère l'index de la tache correspondant à "op1" dans le tableau de taches
+                        if(g->taches[k].ID == op2)                //Récupère l'index de la tache correspondant à "op2" dans le tableau de taches
                         {
-                            g->taches[j].pred[g->taches[j].nbpred] = g->taches[k];      //Met la tache "op1" dans le tableau de predecesseur de "op2"
-                            g->taches[j].nbpred +=1;                                    //Ajoute 1 au nombre de predecesseur
+                            g->taches[k].pred[g->taches[k].nbpred] = g->taches[j];      //Met la tache "op1" dans le tableau de predecesseur de "op2"
+                            g->taches[k].nbpred +=1;                                    //Ajoute 1 au nombre de predecesseur
                         }
                     }
                 }
@@ -124,17 +123,15 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
             fscanf(pf, "%d", &op1);               //Récupère les informations du fichier
             fscanf(pf, "%d", &op2);
             for (int j = 0; j < g->nbtaches; j++) {
-                if (g->taches[j].ID ==
-                    op1)                          //Récupère l'index de la tache correspondant à "op1" dans le tableau de taches
+                if (g->taches[j].ID == op1)                          //Récupère l'index de la tache correspondant à "op1" dans le tableau de taches
                 {
                     for (int k = 0; k < g->nbtaches; k++) {
-                        if (g->taches[k].ID ==
-                            op2)                      //Récupère l'index de la tache correspondant à "op2" dans le tableau de taches
+                        if (g->taches[k].ID == op2)                      //Récupère l'index de la tache correspondant à "op2" dans le tableau de taches
                         {
                             g->taches[j].exclu[g->taches[j].nbexclu] = g->taches[k];      //Met la tache "op2" dans le tableau d'exclusion de "op1"
-                            g->taches[k].exclu[g->taches[j].nbexclu] = g->taches[j];      //Met la tache "op1" dans le tableau d'exclusion de "op2"
-                            g->taches[j].nbexclu += 1;                                    //Ajoute 1 au nombre de predecesseur de "op1"
-                            g->taches[k].nbexclu += 1;                                   //Ajoute 1 au nombre de predecesseur de "op2"
+                            g->taches[k].exclu[g->taches[k].nbexclu] = g->taches[j];      //Met la tache "op1" dans le tableau d'exclusion de "op2"
+                            g->taches[j].nbexclu++;                                    //Ajoute 1 au nombre d'exclus de "op1"
+                            g->taches[k].nbexclu++;                                   //Ajoute 1 au nombre d'exclus de "op2"
                         }
                     }
                 }
@@ -148,7 +145,7 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
     }
 }
 
-stat* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
+chain* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
 
     chain* chaine = (chain*) malloc(sizeof(chain));
@@ -159,47 +156,72 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
-void exclusion(taches *g)
+void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
 {
-    int couleur = 1;
-    taches *listetemp = (taches *)malloc(sizeof(taches) * g->nbtaches);
-    int nbtemp = 0;
-    int nbColorees = 0;
-
-    while(nbColorees != g->nbtaches)
+    int trie=0;                                                 //Variable d'arrêt de boucle
+    while(trie==0)                                              //Boucle tant que la liste n'est pas triée
     {
-        for(int i = 0; i < g->nbtaches; i++){
-            if (g->taches[i].couleur == 0){
-                int X = 0;
-                int exclMax = 0;
-                for(int j = 0; j < g->nbtaches; j++){
-                    if(g->taches[j].nbexclu > exclMax && g->taches[j].couleur == 0){
-                        exclMax = g->taches[j].nbexclu;
-                        X = j;
-                    }
-                    g->taches[X].couleur = couleur;
-                    listetemp->taches[nbtemp] = g->taches[X];
-                    nbtemp++;
-                    nbColorees++;
-                    for(int k = 0; k < g->nbtaches; k++){
-                        if(g->taches[k].couleur == 0){
-                            for(int l = 0; l < g->nbtaches; l++){
-                                for(int m = 0; m < g->taches[k].nbexclu; m++){
-                                    if(g->taches[k].exclu[m].ID == listetemp->taches[l].ID)
-                                        break;
-                                    if(l == nbtemp){
-                                        g->taches[k].couleur = couleur;
-                                        listetemp->taches[nbtemp] = g->taches[k];
-                                        nbtemp++;
-                                        nbColorees++;
-                                    }
-                                }
+        trie=1;
+        for(int i=0;i<tabtask->nbtaches-1;i++)                          //Boucle sur le nombre d'arêtes
+        {
+            if(tabtask->taches[i].nbexclu>tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
+            {
+                trie=0;                                         //On signale que la liste n'est pas triée
+                task inter=tabtask->taches[i];                     //Tache temporaire
+                tabtask->taches[i]=tabtask->taches[i+1];                //échange des positions des taches
+                tabtask->taches[i+1]=inter;
+            }
+        }
+    }
+}
+
+void exclusion(taches* tabtask)
+{
+    int X, exclMax, nbtemp =0, nbColorees = 0, couleur = 1, trie = 0;
+    taches* listetemp = (taches*) malloc(sizeof(taches));
+    task inter;
+    listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
+
+    // Tri à bulles pour ranger les taches par nombre d'exclusions dans une liste temporaire
+    while(trie==0){
+        trie = 1;
+        for(int i = 0; i < tabtask->nbtaches; i++){
+            if(tabtask->taches[i].nbexclu > tabtask->taches[i+1].nbexclu){
+                trie = 0;
+                inter = tabtask->taches[i];
+                listetemp->taches[i] = tabtask->taches[i+1];
+                listetemp->taches[i+1] = inter;
+            }
+        }
+    }
+
+    while(nbColorees != tabtask->nbtaches)          ///Tant que toutes les taches pas colorées
+    {
+
+        for(int i = 0; i < tabtask->nbtaches; i++) {             ///Boucles sur toutes les tâches
+            if (tabtask->taches[i].couleur == 0) {           //Si la tache n'est pas colorée
+                exclMax = 0;
+                for(int j=0;j<nbtemp; j++)      ///Boucle sur la liste temp
+                {
+                    for (int k = 0; k < listetemp->taches[j].nbexclu; k++) {        //Boucle sur les exclus
+                        if (listetemp->taches[j].exclu[k].ID == tabtask->taches[i].ID)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
+                        {
+                            if (listetemp->taches[j].couleur == couleur)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
+                            {
+                                exclMax = -1;
                             }
                         }
                     }
 
+                    if (j == nbtemp - 1 && exclMax != -1)          //Si on est arrivé jusqu'ici, alors la tache n'est pas exclue
+                    {
+                        tabtask->taches[i].couleur = couleur;
+                        nbColorees++;
+                        listetemp->taches[nbtemp] = tabtask->taches[i];
+                        nbtemp++;
+                        break;
+                    }
                 }
-
             }
         }
         couleur++;
@@ -207,7 +229,7 @@ void exclusion(taches *g)
 }
 
 int main() {
-    stat* ws;
+    chain* ws;
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
@@ -221,7 +243,12 @@ int main() {
      * sans prendre en compte les autres contraintes
      * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
      * */
+
     exclusion(tabtask);
+
+    for (int i = 0; i < tabtask->nbtaches; i++) {
+        printf("%d ) Je suis %d de couleur %d\n",i,tabtask->taches[i].ID,tabtask->taches[i].couleur);
+    }
 
     ///CODE PRECEDENCE / TEMPS
 
