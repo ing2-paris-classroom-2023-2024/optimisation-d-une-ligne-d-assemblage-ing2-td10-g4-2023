@@ -159,6 +159,56 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
+<<<<<<< Updated upstream
+=======
+void exclusion()
+{
+    int couleur = 1;
+    taches *listetemp = (taches *)malloc(sizeof(taches)*taches->nbtaches);
+    int nbtemp = 0;
+    int nbColorees = 0;
+
+    while(nbColorees != tabtask->nbtaches)
+    {
+        for(int i = 0; i < tabtask->nbtaches; i++){
+            if (tabtask->taches[i].couleur == 0){
+                int X = 0;
+                int exclMax = 0;
+                for(int j = 0; j < tabtask->nbtaches; j++){
+                    if(tabtask->taches[j].nbexclu > exclMax && tabtask->taches[j].couleur == 0){
+                        exclMax = tabtask->taches[j].nbexclu;
+                        X = j;
+                    }
+                    tabtask->taches[X].couleur = couleur;
+                    listetemp[nbtemp] = tabtask->taches[X];
+                    nbtemp++;
+                    nbColorees++;
+                    for(int k = 0; k < tabtask->nbtaches; k++){
+                        if(tabtask->taches[k].couleur == 0){
+                            for(int l = 0; l < tabtask->nbtaches; l++){
+                                for(int m = 0; m < tabtask->taches[k].nbexclu; m++){
+                                    if(tabtask->taches[k].exclu[m].ID == listetemp[l])
+                                        break;
+                                    if(l == nbtemp){
+                                        tabtask->taches[k].couleur = couleur;
+                                        listetemp[nbtemp] = tabtask->taches[k];
+                                        nbtemp++;
+                                        nbColorees++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+        couleur++;
+    }
+}
+
+>>>>>>> Stashed changes
 int main() {
     stat* ws;
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
