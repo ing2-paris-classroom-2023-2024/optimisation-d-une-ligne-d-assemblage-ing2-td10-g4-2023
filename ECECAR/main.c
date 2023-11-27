@@ -118,8 +118,6 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
     if(pf != NULL) {
         for (int i = 0; i < g->nbtaches; i++) {
             g->taches[i].exclu = (task *) malloc(sizeof(task) * g->nbtaches);
-            g->taches[i].couleur = 0;                               // Initialise les couleurs des taches (0 = non colorée)
-
         }
         for (int i = 0; i < nblignes; i++)                                      //Rempli un tableau de predecesseur
         {
@@ -135,8 +133,8 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
                         {
                             g->taches[j].exclu[g->taches[j].nbexclu] = g->taches[k];      //Met la tache "op2" dans le tableau d'exclusion de "op1"
                             g->taches[k].exclu[g->taches[j].nbexclu] = g->taches[j];      //Met la tache "op1" dans le tableau d'exclusion de "op2"
-                            g->taches[j].nbexclu += 1;                                    //Ajoute 1 au nombre d'exclusion de "op1"
-                            g->taches[k].nbexclu += 1;                                   //Ajoute 1 au nombre d'exclusion de "op2"
+                            g->taches[j].nbexclu += 1;                                    //Ajoute 1 au nombre de predecesseur de "op1"
+                            g->taches[k].nbexclu += 1;                                   //Ajoute 1 au nombre de predecesseur de "op2"
                         }
                     }
                 }
@@ -161,37 +159,37 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
-void exclusion()
+void exclusion(taches *g)
 {
     int couleur = 1;
-    int *listetemp = (int*)malloc(sizeof(int));
+    taches *listetemp = (taches *)malloc(sizeof(taches) * g->nbtaches);
     int nbtemp = 0;
     int nbColorees = 0;
 
-    while(nbColorees != tabtask->nbtaches)
+    while(nbColorees != g->nbtaches)
     {
-        for(int i = 0; i < tabtask->nbtaches; i++){
-            if (tabtask->taches[i].couleur == 0){
+        for(int i = 0; i < g->nbtaches; i++){
+            if (g->taches[i].couleur == 0){
                 int X = 0;
                 int exclMax = 0;
-                for(int j = 0; j < tabtask->nbtaches; j++){
-                    if(tabtask->taches[j].nbexclu > exclMax && tabtask->taches[j].couleur == 0){
-                        exclMax = tabtask->taches[j].nbexclu;
+                for(int j = 0; j < g->nbtaches; j++){
+                    if(g->taches[j].nbexclu > exclMax && g->taches[j].couleur == 0){
+                        exclMax = g->taches[j].nbexclu;
                         X = j;
                     }
-                    tabtask->taches[X].couleur = couleur;
-                    listetemp[nbtemp] = tabtask->taches[X].ID;
+                    g->taches[X].couleur = couleur;
+                    listetemp->taches[nbtemp] = g->taches[X];
                     nbtemp++;
                     nbColorees++;
-                    for(int k = 0; k < tabtask->nbtaches; k++){
-                        if(tabtask->taches[k].couleur == 0){
-                            for(int l = 0; l < tabtask->nbtaches; l++){
-                                for(int m = 0; m < tabtask->taches[k].nbexclu; m++){
-                                    if(tabtask->taches[k].exclu[m].ID == listetemp[l])
+                    for(int k = 0; k < g->nbtaches; k++){
+                        if(g->taches[k].couleur == 0){
+                            for(int l = 0; l < g->nbtaches; l++){
+                                for(int m = 0; m < g->taches[k].nbexclu; m++){
+                                    if(g->taches[k].exclu[m].ID == listetemp->taches[l].ID)
                                         break;
                                     if(l == nbtemp){
-                                        tabtask->taches[k].couleur = couleur;
-                                        listetemp[nbtemp] = k;
+                                        g->taches[k].couleur = couleur;
+                                        listetemp->taches[nbtemp] = g->taches[k];
                                         nbtemp++;
                                         nbColorees++;
                                     }
@@ -223,8 +221,7 @@ int main() {
      * sans prendre en compte les autres contraintes
      * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
      * */
-
-    exclusion();
+    exclusion(tabtask);
 
     ///CODE PRECEDENCE / TEMPS
 
