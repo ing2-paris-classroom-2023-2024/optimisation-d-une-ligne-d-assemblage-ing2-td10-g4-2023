@@ -159,8 +159,6 @@ stat* init_station(char* file_name)                             ///Fonction de l
     return chaine;
 }
 
-<<<<<<< Updated upstream
-=======
 void exclusion()
 {
     int couleur = 1;
@@ -208,7 +206,6 @@ void exclusion()
     }
 }
 
->>>>>>> Stashed changes
 int main() {
     stat* ws;
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
