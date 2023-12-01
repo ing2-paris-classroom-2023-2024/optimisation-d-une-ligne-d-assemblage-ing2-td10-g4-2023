@@ -177,43 +177,54 @@ void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes pa
 
 void exclusion(taches* tabtask)
 {
-    int X, exclMax, nbtemp =0, nbColorees = 0, couleur = 1, trie = 0;
+    int X, nbtemp = 0, nbColorees = 0, couleur = 1, trie = 0;
     taches* listetemp = (taches*) malloc(sizeof(taches));
     task inter;
     listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
 
+    listetemp = tabtask;
+
     // Tri à bulles pour ranger les taches par nombre d'exclusions dans une liste temporaire
     while(trie==0){
         trie = 1;
-        for(int i = 0; i < tabtask->nbtaches; i++){
-            if(tabtask->taches[i].nbexclu > tabtask->taches[i+1].nbexclu){
+        for(int i = 0; i < listetemp->nbtaches; i++){
+            if(listetemp->taches[i].nbexclu < listetemp->taches[i+1].nbexclu){
                 trie = 0;
-                inter = tabtask->taches[i];
-                listetemp->taches[i] = tabtask->taches[i+1];
+                inter = listetemp->taches[i];
+                listetemp->taches[i] = listetemp->taches[i+1];
                 listetemp->taches[i+1] = inter;
             }
         }
+    }
+    for(int i = 0 ; i < listetemp->nbtaches ; i++){
+        printf("%d %d \n" , listetemp->taches[i].ID, listetemp->taches[i].nbexclu);
     }
 
     while(nbColorees != tabtask->nbtaches)          ///Tant que toutes les taches pas colorées
     {
 
         for(int i = 0; i < tabtask->nbtaches; i++) {             ///Boucles sur toutes les tâches
+            printf("test");
             if (tabtask->taches[i].couleur == 0) {           //Si la tache n'est pas colorée
-                exclMax = 0;
-                for(int j=0;j<nbtemp; j++)      ///Boucle sur la liste temp
+                X = 0;
+
+                for(int j = 0; j < listetemp->nbtaches; j++)      ///Boucle sur la liste temp
                 {
+                    listetemp->taches[j].couleur = couleur;
+                    tabtask->taches[listetemp->taches[j].ID - 1].couleur = couleur;
+                    nbColorees++;
+                    nbtemp++;
                     for (int k = 0; k < listetemp->taches[j].nbexclu; k++) {        //Boucle sur les exclus
                         if (listetemp->taches[j].exclu[k].ID == tabtask->taches[i].ID)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
                         {
                             if (listetemp->taches[j].couleur == couleur)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
                             {
-                                exclMax = -1;
+                                X = -1;
                             }
                         }
                     }
 
-                    if (j == nbtemp - 1 && exclMax != -1)          //Si on est arrivé jusqu'ici, alors la tache n'est pas exclue
+                    if (j == nbtemp - 1 && X != -1)          //Si on est arrivé jusqu'ici, alors la tache n'est pas exclue
                     {
                         tabtask->taches[i].couleur = couleur;
                         nbColorees++;
@@ -226,6 +237,8 @@ void exclusion(taches* tabtask)
         }
         couleur++;
     }
+    printf("exclusions effectuées");
+    exit(1);
 }
 
 int main() {
