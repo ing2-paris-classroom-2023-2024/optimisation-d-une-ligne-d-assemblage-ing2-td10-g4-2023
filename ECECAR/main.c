@@ -145,15 +145,22 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
     }
 }
 
-chain* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
+chain* init_chaine(char* file_name, taches* g,chain* ws)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
-
-    chain* chaine = (chain*) malloc(sizeof(chain));
+    ws->chaine = (stat*) (chain *) malloc(sizeof(stat) * g->nbtaches);
+    for (int i = 0; i < g->nbtaches; i++) {
+        ws->chaine[i].tabstat =(task*) malloc(sizeof(stat) * g->nbtaches);
+        ws->chaine[i].rang =0;
+        ws->chaine[i].nbtask = 0;
+        for (int j = 0; j < g->nbtaches; ++j) {
+            ws->chaine[i].tabstat =(task*) malloc(sizeof(stat));
+        }
+    }
     FILE *pf = fopen(file_name,"r");                        //Ouvre le fichier sous le nom pf
-    fscanf(pf,"%d",&chaine->tempsmax);
+    fscanf(pf,"%d",&ws->tempsmax);
     fclose(pf);
 
-    return chaine;
+    return ws;
 }
 
 void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
@@ -175,7 +182,7 @@ void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes pa
     }
 }
 
-void exclusion(taches* tabtask)
+void exclusion(taches* tabtask,chain* ws)
 {
     int X, exclMax, nbtemp =0, nbColorees = 0, couleur = 1;
     taches* listetemp = (taches*) malloc(sizeof(taches));
@@ -223,15 +230,35 @@ void exclusion(taches* tabtask)
         }
         couleur++;
     }
+    for (int i = 0; i < couleur-1; i++) {
+        taches* listetempbis = (taches*) malloc(sizeof(taches));
+        listetempbis->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
+        nbtemp=0;
+        for (int j = 0; j < tabtask->nbtaches; j++) {
+            if(tabtask->taches[j].couleur == i+1)
+            {
+                listetempbis->taches[nbtemp] = tabtask->taches[j];
+                nbtemp++;
+            }
+        }
+        ws->chaine[i].tabstat = listetempbis->taches;
+        ws->chaine[i].nbtask = nbtemp;
+        ws->chaine[i].rang=i+1;
+        free(listetempbis);
+    }
+    ws->nbstat = couleur-1;
+    free(listetemp);
 }
 
 int main() {
-    chain* ws;
+
+    int couleur;
+    chain* ws = (chain*) malloc(sizeof(chain));
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
-    ws = init_station("temps_cycle.txt");                   // Fonction de définition du temps par station
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
     ///CODE EXCLUSION
 
@@ -241,25 +268,14 @@ int main() {
      * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
      * */
 
-    for (int i = 0; i < tabtask->nbtaches; i++) {
-        printf("%d ) Je suis %d avec %d exclus: \n",i,tabtask->taches[i].ID,tabtask->taches[i].nbexclu);
-        for (int j = 0; j < tabtask->taches[i].nbexclu; ++j) {
-            printf("%d ) Exclu : %d \n",j+1,tabtask->taches[i].exclu[j].ID);
+    exclusion(tabtask,ws);
+
+    ///AFFICHAGE EXCLUSION
+    for (int i = 0; i < ws->nbstat; i++) {
+        printf("%d ) Je suis la station %d :\n",i,ws->chaine[i].rang);
+        for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
+            printf("    Tache : %d\n",ws->chaine[i].tabstat[j].ID);
         }
-    }
-
-    printf("---------------------------------------\n");
-
-    for (int i = 0; i < tabtask->nbtaches; i++) {
-        printf("%d ) Je suis %d avec %d predecesseur: \n",i,tabtask->taches[i].ID,tabtask->taches[i].nbpred);
-        for (int j = 0; j < tabtask->taches[i].nbpred; ++j) {
-            printf("%d ) Pred : %d \n",j+1,tabtask->taches[i].pred[j].ID);
-        }
-    }
-    exclusion(tabtask);
-
-    for (int i = 0; i < tabtask->nbtaches; i++) {
-        printf("%d ) Je suis %d de couleur %d\n",i,tabtask->taches[i].ID,tabtask->taches[i].couleur);
     }
 
     ///CODE PRECEDENCE / TEMPS
@@ -269,6 +285,8 @@ int main() {
      * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
      * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
      * */
+
+    ///AFFICHAGE PRECEDENCE / TEMPS
 
     free(tabtask);
     return 0;
