@@ -148,16 +148,17 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
 chain* init_chaine(char* file_name, taches* g,chain* ws)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
     ws->chaine = (stat*) (chain *) malloc(sizeof(stat) * g->nbtaches);
+    ws->nbstat = 0;
     for (int i = 0; i < g->nbtaches; i++) {
         ws->chaine[i].tabstat =(task*) malloc(sizeof(stat) * g->nbtaches);
         ws->chaine[i].rang =0;
         ws->chaine[i].nbtask = 0;
-        for (int j = 0; j < g->nbtaches; ++j) {
+        for (int j = 0; j < g->nbtaches; j++) {
             ws->chaine[i].tabstat =(task*) malloc(sizeof(stat));
         }
     }
     FILE *pf = fopen(file_name,"r");                        //Ouvre le fichier sous le nom pf
-    fscanf(pf,"%d",&ws->tempsmax);
+    fscanf(pf,"%f",&ws->tempsmax);
     fclose(pf);
 
     return ws;
@@ -285,6 +286,8 @@ int main() {
      * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
      * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
      * */
+
+
 
     ///AFFICHAGE PRECEDENCE / TEMPS
 
