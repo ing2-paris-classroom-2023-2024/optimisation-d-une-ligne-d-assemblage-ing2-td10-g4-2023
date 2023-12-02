@@ -145,18 +145,26 @@ void init_exclu(char* file_name, taches *g)         ///Fonction de lecture de fi
     }
 }
 
-chain* init_station(char* file_name)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
+chain* init_chaine(char* file_name, taches* g,chain* ws)                             ///Fonction de lecture de fichier pour le temps d'un cycle pour les stations
 {
-
-    chain* chaine = (chain*) malloc(sizeof(chain));
+    ws->chaine = (stat*) (chain *) malloc(sizeof(stat) * g->nbtaches);
+    ws->nbstat = 0;
+    for (int i = 0; i < g->nbtaches; i++) {
+        ws->chaine[i].tabstat =(task*) malloc(sizeof(stat) * g->nbtaches);
+        ws->chaine[i].rang =0;
+        ws->chaine[i].nbtask = 0;
+        for (int j = 0; j < g->nbtaches; j++) {
+            ws->chaine[i].tabstat =(task*) malloc(sizeof(stat));
+        }
+    }
     FILE *pf = fopen(file_name,"r");                        //Ouvre le fichier sous le nom pf
-    fscanf(pf,"%d",&chaine->tempsmax);
+    fscanf(pf,"%f",&ws->tempsmax);
     fclose(pf);
 
-    return chaine;
+    return ws;
 }
 
-void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
+taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
 {
     int trie=0;                                                 //Variable d'arrêt de boucle
     while(trie==0)                                              //Boucle tant que la liste n'est pas triée
@@ -164,7 +172,7 @@ void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes pa
         trie=1;
         for(int i=0;i<tabtask->nbtaches-1;i++)                          //Boucle sur le nombre d'arêtes
         {
-            if(tabtask->taches[i].nbexclu>tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
+            if(tabtask->taches[i].nbexclu < tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
             {
                 trie=0;                                         //On signale que la liste n'est pas triée
                 task inter=tabtask->taches[i];                     //Tache temporaire
@@ -173,81 +181,86 @@ void tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes pa
             }
         }
     }
+    return tabtask;
 }
 
-void exclusion(taches* tabtask)
+void exclusion(taches* tabtask,chain* ws)
 {
-    int X, nbtemp = 0, nbColorees = 0, couleur = 1, trie = 0;
+    int validExclu, nbColorees = 0, couleur = 0;
     taches* listetemp = (taches*) malloc(sizeof(taches));
-    task inter;
     listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
-
-    listetemp = tabtask;
-
-    // Tri à bulles pour ranger les taches par nombre d'exclusions dans une liste temporaire
-    while(trie==0){
-        trie = 1;
-        for(int i = 0; i < listetemp->nbtaches; i++){
-            if(listetemp->taches[i].nbexclu < listetemp->taches[i+1].nbexclu){
-                trie = 0;
-                inter = listetemp->taches[i];
-                listetemp->taches[i] = listetemp->taches[i+1];
-                listetemp->taches[i+1] = inter;
-            }
-        }
-    }
-    for(int i = 0 ; i < listetemp->nbtaches ; i++){
-        printf("%d %d \n" , listetemp->taches[i].ID, listetemp->taches[i].nbexclu);
-    }
-
-    while(nbColorees != tabtask->nbtaches)          ///Tant que toutes les taches pas colorées
+    listetemp->nbtaches = 0;
+    tabtask = tri_a_bulle(tabtask);
+    while(nbColorees < tabtask->nbtaches)                     //Tant que toutes les taches pas colorées
     {
-
-        for(int i = 0; i < tabtask->nbtaches; i++) {             ///Boucles sur toutes les tâches
-            printf("test");
-            if (tabtask->taches[i].couleur == 0) {           //Si la tache n'est pas colorée
-                X = 0;
-
-                for(int j = 0; j < listetemp->nbtaches; j++)      ///Boucle sur la liste temp
+        couleur++;
+        for(int i = 0; i < tabtask->nbtaches; i++) {          //Prendre le premier sommet non coloré
+            if (tabtask->taches[i].couleur == 0) {
+                tabtask->taches[i].couleur = couleur;       //On colorie la tache avec la nouvelle couleur
+                listetemp->taches[listetemp->nbtaches] = tabtask->taches[i];//On ajoute la tache dans une liste temporaire
+                listetemp->nbtaches++;
+                nbColorees++;
+                for(int j = 0; j < tabtask->nbtaches; j++)      //Boucle sur toutes les taches
                 {
-                    listetemp->taches[j].couleur = couleur;
-                    tabtask->taches[listetemp->taches[j].ID - 1].couleur = couleur;
-                    nbColorees++;
-                    nbtemp++;
-                    for (int k = 0; k < listetemp->taches[j].nbexclu; k++) {        //Boucle sur les exclus
-                        if (listetemp->taches[j].exclu[k].ID == tabtask->taches[i].ID)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
-                        {
-                            if (listetemp->taches[j].couleur == couleur)         // Si on trouve un seul exclu dans listetemp on arrête la boucle sur les exclus
-                            {
-                                X = -1;
+                    if(tabtask->taches[j].couleur == 0){
+                        validExclu = 0;
+                        for (int k = 0; k < tabtask->taches[j].nbexclu; k++) {        //Boucle sur les exclus
+                            for (int l = 0; l < listetemp->nbtaches; l++) {
+                                if (listetemp->taches[l].ID == tabtask->taches[j].exclu[k].ID)
+                                {                    // Si on trouve un seul exclu dans listetemp on vérifie sa couleur
+                                    if (listetemp->taches[l].couleur == couleur)//Si l exclue est de la couleur actuelle
+                                    {
+                                        validExclu = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (validExclu == 1) {
+                                break;
                             }
                         }
-                    }
-
-                    if (j == nbtemp - 1 && X != -1)          //Si on est arrivé jusqu'ici, alors la tache n'est pas exclue
-                    {
-                        tabtask->taches[i].couleur = couleur;
-                        nbColorees++;
-                        listetemp->taches[nbtemp] = tabtask->taches[i];
-                        nbtemp++;
-                        break;
+                        if (validExclu == 0) {
+                            tabtask->taches[j].couleur = couleur;       //On colorie la tache avec la nouvelle couleur
+                            listetemp->taches[listetemp->nbtaches] = tabtask->taches[j];
+                            listetemp->nbtaches++;
+                            nbColorees++;
+                        }
                     }
                 }
+                break;
             }
         }
-        couleur++;
     }
-    printf("exclusions effectuées");
-    exit(1);
+    for (int i = 0; i < couleur; i++) {
+        taches* listetempbis = (taches*) malloc(sizeof(taches));
+        listetempbis->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
+        listetempbis->nbtaches = 0;
+        for (int j = 0; j < tabtask->nbtaches; j++) {
+            if(tabtask->taches[j].couleur == i+1)
+            {
+                listetempbis->taches[listetempbis->nbtaches] = tabtask->taches[j];
+                listetempbis->nbtaches++;
+            }
+        }
+        ws->chaine[i].tabstat = listetempbis->taches;
+        ws->chaine[i].nbtask = listetempbis->nbtaches;
+        ws->chaine[i].rang=i+1;
+        free(listetempbis);
+    }
+    ws->nbstat = couleur;
+    free(listetemp);
+    printf("exclusions effectuees\n");
 }
 
 int main() {
-    chain* ws;
+
+    int couleur;
+    chain* ws = (chain*) malloc(sizeof(chain));
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
-    ws = init_station("temps_cycle.txt");                   // Fonction de définition du temps par station
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
     ///CODE EXCLUSION
 
@@ -257,10 +270,26 @@ int main() {
      * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
      * */
 
-    exclusion(tabtask);
+    exclusion(tabtask,ws);
 
-    for (int i = 0; i < tabtask->nbtaches; i++) {
-        printf("%d ) Je suis %d de couleur %d\n",i,tabtask->taches[i].ID,tabtask->taches[i].couleur);
+    ///AFFICHAGE EXCLUSION
+    for (int i = 0; i < ws->nbstat; i++) {
+        printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
+        for (int j = 0; j < ws->chaine[i].nbtask; j++) {
+            if(j==0)
+            {
+                printf("   ");
+            }
+            printf("%d",ws->chaine[i].tabstat[j].ID);
+            if(j<ws->chaine[i].nbtask - 1)
+            {
+                printf(", ");
+            }
+            else
+            {
+                printf("\n");
+            }
+        }
     }
 
     ///CODE PRECEDENCE / TEMPS
@@ -270,6 +299,10 @@ int main() {
      * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
      * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
      * */
+
+
+
+    ///AFFICHAGE PRECEDENCE / TEMPS
 
     free(tabtask);
     return 0;
