@@ -393,9 +393,6 @@ int main() {
         }
     }
 
-    free(tabtask);
-    free(ws);
-
     ws = (chain*) malloc(sizeof(chain));
     tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
@@ -427,5 +424,6 @@ int main() {
     }
 
     free(tabtask);
+    free(ws);
     return 0;
 }
