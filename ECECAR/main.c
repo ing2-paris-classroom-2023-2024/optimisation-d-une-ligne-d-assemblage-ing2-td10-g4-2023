@@ -164,7 +164,9 @@ chain* init_chaine(char* file_name, taches* g,chain* ws)                        
     return ws;
 }
 
+
 taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
+
 {
     int trie=0;                                                 //Variable d'arrêt de boucle
     while(trie==0)                                              //Boucle tant que la liste n'est pas triée
@@ -172,6 +174,7 @@ taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes
         trie=1;
         for(int i=0;i<tabtask->nbtaches-1;i++)                          //Boucle sur le nombre d'arêtes
         {
+
             if(tabtask->taches[i].nbexclu < tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
             {
                 trie=0;                                         //On signale que la liste n'est pas triée
@@ -181,11 +184,14 @@ taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes
             }
         }
     }
+
     return tabtask;
+
 }
 
 void exclusion(taches* tabtask,chain* ws)
 {
+
     int validExclu, nbColorees = 0, couleur = 0;
     taches* listetemp = (taches*) malloc(sizeof(taches));
     listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
@@ -250,6 +256,7 @@ void exclusion(taches* tabtask,chain* ws)
     ws->nbstat = couleur;
     free(listetemp);
     printf("exclusions effectuees\n");
+
 }
 
 int main() {
@@ -274,6 +281,7 @@ int main() {
 
     ///AFFICHAGE EXCLUSION
     for (int i = 0; i < ws->nbstat; i++) {
+
         printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
         for (int j = 0; j < ws->chaine[i].nbtask; j++) {
             if(j==0)
@@ -289,6 +297,7 @@ int main() {
             {
                 printf("\n");
             }
+
         }
     }
 
