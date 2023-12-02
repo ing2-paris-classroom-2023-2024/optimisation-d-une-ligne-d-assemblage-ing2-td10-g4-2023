@@ -268,7 +268,6 @@ void tri_precedence (chain* wagon, taches* listetaches) {
 }
 
 taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
-
 {
     int trie=0;                                                 //Variable d'arrêt de boucle
     while(trie==0)                                              //Boucle tant que la liste n'est pas triée
@@ -276,7 +275,6 @@ taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes
         trie=1;
         for(int i=0;i<tabtask->nbtaches-1;i++)                          //Boucle sur le nombre d'arêtes
         {
-
             if(tabtask->taches[i].nbexclu < tabtask->taches[i+1].nbexclu)     //Si la tache actuelle à plus d'exclusion que la suivante, on échange :
             {
                 trie=0;                                         //On signale que la liste n'est pas triée
@@ -286,9 +284,7 @@ taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes
             }
         }
     }
-
     return tabtask;
-
 }
 
 void exclusion(taches* tabtask,chain* ws)
@@ -309,7 +305,7 @@ void exclusion(taches* tabtask,chain* ws)
                 nbColorees++;
                 for(int j = 0; j < tabtask->nbtaches; j++)      //Boucle sur toutes les taches
                 {
-                    if(tabtask->taches[j].couleur == 0){
+                   if(tabtask->taches[j].couleur == 0){
                         validExclu = 0;
                         for (int k = 0; k < tabtask->taches[j].nbexclu; k++) {        //Boucle sur les exclus
                             for (int l = 0; l < listetemp->nbtaches; l++) {
@@ -332,7 +328,7 @@ void exclusion(taches* tabtask,chain* ws)
                             listetemp->nbtaches++;
                             nbColorees++;
                         }
-                    }
+                   }
                 }
                 break;
             }
@@ -360,7 +356,6 @@ void exclusion(taches* tabtask,chain* ws)
 }
 
 int main() {
-
     chain* ws = (chain*) malloc(sizeof(chain));
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
@@ -380,7 +375,6 @@ int main() {
 
     ///AFFICHAGE EXCLUSION
     for (int i = 0; i < ws->nbstat; i++) {
-
         printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
         for (int j = 0; j < ws->chaine[i].nbtask; j++) {
             if(j==0)
@@ -396,7 +390,6 @@ int main() {
             {
                 printf("\n");
             }
-
         }
     }
 
