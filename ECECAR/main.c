@@ -361,7 +361,6 @@ void exclusion(taches* tabtask,chain* ws)
 
 int main() {
 
-    int couleur;
     chain* ws = (chain*) malloc(sizeof(chain));
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
@@ -370,6 +369,8 @@ int main() {
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
     ///CODE EXCLUSION
+
+    exclusion(tabtask, ws);
 
     /*
      * Cherchez à répondre à la contrainte d'exclusion,
@@ -399,6 +400,16 @@ int main() {
         }
     }
 
+    free(tabtask);
+    free(ws);
+
+    ws = (chain*) malloc(sizeof(chain));
+    tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
+    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
+    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
+    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
+
     ///CODE PRECEDENCE / TEMPS
 
     /*
@@ -410,7 +421,7 @@ int main() {
     tri_precedence (ws, tabtask);
 
     ///AFFICHAGE PRECEDENCE / TEMPS
-    for (int i = 0; i < ws->nbstat; i++) {
+    for (int i = 0; i < ws->nbstat - 1; i++) {
         printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
         printf("Taches : ");
         for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
