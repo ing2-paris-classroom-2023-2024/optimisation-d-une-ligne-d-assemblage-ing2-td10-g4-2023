@@ -166,74 +166,83 @@ chain* init_chaine(char* file_name, taches* g,chain* ws)                        
 
 
 void tri_precedence (chain* wagon, taches* listetaches) {
-    taches *listetemp = (taches *) malloc(sizeof(taches) * listetaches->nbtaches);		//Liste temporaire de taches
-    int compteurtaches = 0, change = 0;
+    taches *listetemp = (taches *) malloc(sizeof(taches));		//Liste temporaire de taches
+    listetemp->taches = (task *) malloc(sizeof(task) * listetaches->nbtaches);
+    int compteurtaches = 0, change = 0, validpred = 0;
     float tempsrestant;
+    listetemp->nbtaches = 0;
     while (compteurtaches < listetaches->nbtaches) {            ///TANT QUE PAS TOUTES TACHE COLOREES
         for (int i = 0; i < listetaches->nbtaches; i++) {       //Parcours de toutes les taches
             if (listetaches->taches[i].marque !=1){             //Si la couleur n'est pas déjà dans la liste temporaire
                 if (listetaches->taches[i].nbpred == 0) {                         /// SI PAS DE PRED
-                    listetemp->taches[compteurtaches] = listetaches->taches[i];
+                    listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
                     listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
-                    compteurtaches++;
+                    listetemp->nbtaches++;
                 }
                 else {                                                                     // SI PRED
+                    validpred = 0;
                     for (int j = 0; j < listetaches->taches[i].nbpred; j++) {                       // POUR CHAQUE PRED
                         for (int k= 0; k < listetemp->nbtaches; k++) {                   //On vérifie que les prédecesseurs sont déjà rangés
-                            if (listetaches->taches[i].pred[j].ID == listetaches->taches[k].ID) {
+                            if (listetaches->taches[i].pred[j].ID == listetemp->taches[k].ID) {
                                 if (listetemp->taches[k].marque != 1) {                           //Si un predecesseur n'est pas dans une station
+                                    validpred = 1;
                                     break;
                                 }
-                                if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été marqués, alors on ajoute la tache à notre liste temporaire
-                                {
-                                    listetemp->taches[compteurtaches] = listetaches->taches[i];
-                                    listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
-                                    compteurtaches++;
-                                }
                             }
+                        }
+                        if (validpred == 1) {
+                            break;
+                        }
+                        if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été marqués, alors on ajoute la tache à notre liste temporaire
+                        {
+                            listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
+                            listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
+                            listetemp->nbtaches++;
                         }
                     }
                 }
             }
         }
         for (int i = 0; i < wagon->nbstat; i++) {   //Pour chaque station, donc on doit creer au moins une station avant
-            listetemp->nbtaches=compteurtaches;     //On fixe le nombre de taches dans la liste
             tempsrestant = wagon->tempsmax - wagon->chaine[i].tempsactuel; //On vérifie le temps restant de la station
-            int X;
-            float max = -1;
+            int X = 0;
+            float max = 0;
+            change = 0;
             for (int j = 0; j < listetemp->nbtaches; j++) {     //On cherche le maximum de temps qui rentre dans la station
-                if(listetemp->taches[j].temps <= tempsrestant && listetemp->taches[j].temps > max)
-                {
-                    /*Si la tache n'a pas de predecesseurs, on peut la ranger dans la premiere station qui vient (si c'est la plus longue)
-                    * Sinon, on doit vérifier que les prédecesseurs de cette tache soient au moins dans la station qu'on veut inserer.
-                    * */
-                    if(listetemp->taches[j].nbpred==0)
+                if (listetemp->taches[j].marque != 1) {
+                    if(listetemp->taches[j].temps <= tempsrestant && listetemp->taches[j].temps > max)
                     {
-                        X = j;
-                        max = listetemp->taches[j].temps;
-                        change = 1;
-                    }
-                    else
-                    {
-                        /*Chercher dans la station i et avant s'il y a tout les predecesseurs
-                         * Boucle sur les taches de chaque station et chaque predecesseur, si les ID correspondent, on valide pour ce predecesseur
-                         * */
-                        int validPred = 0;
-                        for (int k = 0; k < i+1; k++) {
-                            for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
-                                for (int m = 0; m < listetemp->taches[j].nbpred; ++m) {
-                                    if(wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID)
-                                    {
-                                        validPred++;
-                                    }
-                                }
-                            }
-                        }
-                        if(validPred == listetemp->taches[j].nbpred) //Si tout les predecesseurs sont bien dans une station precedentes on enregistre l'index et le temps de la tache
+                        /*Si la tache n'a pas de predecesseurs, on peut la ranger dans la premiere station qui vient (si c'est la plus longue)
+                        * Sinon, on doit vérifier que les prédecesseurs de cette tache soient au moins dans la station qu'on veut inserer.
+                        * */
+                        if(listetemp->taches[j].nbpred==0)
                         {
                             X = j;
                             max = listetemp->taches[j].temps;
                             change = 1;
+                        }
+                        else
+                        {
+                            /*Chercher dans la station i et avant s'il y a tout les predecesseurs
+                             * Boucle sur les taches de chaque station et chaque predecesseur, si les ID correspondent, on valide pour ce predecesseur
+                             * */
+                            int validPred = 0;
+                            for (int k = 0; k < i+1; k++) {
+                                for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
+                                    for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
+                                        if(wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID)
+                                        {
+                                            validPred++;
+                                        }
+                                    }
+                                }
+                            }
+                            if(validPred == listetemp->taches[j].nbpred) //Si tout les predecesseurs sont bien dans une station precedentes on enregistre l'index et le temps de la tache
+                            {
+                                X = j;
+                                max = listetemp->taches[j].temps;
+                                change = 1;
+                            }
                         }
                     }
                 }
@@ -244,6 +253,8 @@ void tri_precedence (chain* wagon, taches* listetaches) {
                 wagon->chaine[i].tabstat[wagon->chaine[i].nbtask] = listetemp->taches[X];       //On l'ajoute
                 wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses taches
                 wagon->chaine[i].nbtask++;
+                compteurtaches++;
+                break;
             }
         }
         if(change == 0)             //Si on a pas réussi à inserer une tache dans une station, on en creer une nouvelle.
@@ -287,9 +298,14 @@ int main() {
 
     ///AFFICHAGE PRECEDENCE / TEMPS
     for (int i = 0; i < ws->nbstat; i++) {
-        printf("%d ) Je suis la station %d :\n",i,ws->chaine[i].rang);
+        printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+        printf("Taches : ");
         for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
-            printf("    Tache : %d\n",ws->chaine[i].tabstat[j].ID);
+            printf("%d",ws->chaine[i].tabstat[j].ID);
+            if (j < ws->chaine[i].nbtask - 1) {
+                printf(", ");
+            }
+            else printf("\n");
         }
     }
 
