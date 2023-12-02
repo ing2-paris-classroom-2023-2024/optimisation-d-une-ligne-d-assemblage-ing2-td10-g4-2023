@@ -5,6 +5,7 @@
 typedef struct Task{
     int ID;
     int marque;
+    int couleur;
     int nbpred;
     int nbexclu;
     float temps;
