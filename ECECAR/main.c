@@ -423,6 +423,8 @@ int main() {
         }
     }
 
+    printf("Romain t'es beau");
+
     free(tabtask);
     free(ws);
     return 0;
