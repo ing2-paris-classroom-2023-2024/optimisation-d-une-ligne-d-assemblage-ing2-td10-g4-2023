@@ -164,35 +164,35 @@ chain* init_chaine(char* file_name, taches* g,chain* ws)                        
     return ws;
 }
 
-void tri_precedence (chain* wagon, taches* listetaches) {
+void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de répartition en stations en fonction de conditions de précedence et de temps
     taches *listetemp = (taches *) malloc(sizeof(taches));		//Liste temporaire de taches
     listetemp->taches = (task *) malloc(sizeof(task) * listetaches->nbtaches);
     int compteurtaches = 0, change = 0, validpred = 0;
     float tempsrestant;
     listetemp->nbtaches = 0;
-    while (compteurtaches < listetaches->nbtaches) {            ///TANT QUE PAS TOUTES TACHE COLOREES
+    while (compteurtaches < listetaches->nbtaches) {            ///Tant que toutes les taches n'ont pas été mises en station
         for (int i = 0; i < listetaches->nbtaches; i++) {       //Parcours de toutes les taches
             if (listetaches->taches[i].marque !=1){             //Si la couleur n'est pas déjà dans la liste temporaire
-                if (listetaches->taches[i].nbpred == 0) {                         /// SI PAS DE PRED
-                    listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
-                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
+                if (listetaches->taches[i].nbpred == 0) {                         //Et qu'elle n'a pas de prédecesseurs
+                    listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];        //Ajout de la tache dans la liste temporaire
+                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas en station
                     listetemp->nbtaches++;
                 }
-                else {                                                                     // SI PRED
+                else {                                                                     // Si elle a un ou plusieurs predecesseurs
                     validpred = 0;
-                    for (int j = 0; j < listetaches->taches[i].nbpred; j++) {                       // POUR CHAQUE PRED
-                        for (int k= 0; k < listetemp->nbtaches; k++) {                   //On vérifie que les prédecesseurs sont déjà rangés
+                    for (int j = 0; j < listetaches->taches[i].nbpred; j++) {                      // Pour chaque predecesseur
+                        for (int k= 0; k < listetemp->nbtaches; k++) {                   //On vérifie que les prédecesseurs sont déjà dans une station
                             if (listetaches->taches[i].pred[j].ID == listetemp->taches[k].ID) {
                                 if (listetemp->taches[k].marque != 1) {                           //Si un predecesseur n'est pas dans une station
                                     validpred = 1;
-                                    break;
+                                    break;                                //On arrête la boucle pour ne pas perdre de temps
                                 }
                             }
                         }
-                        if (validpred == 1) {
+                        if (validpred == 1) {            //On arrete la deuxieme boucle
                             break;
                         }
-                        if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été marqués, alors on ajoute la tache à notre liste temporaire
+                        if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été mis en station, alors on ajoute la tache à notre liste temporaire
                         {
                             listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
                             listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
@@ -201,10 +201,10 @@ void tri_precedence (chain* wagon, taches* listetaches) {
                         }
                     }
                 }
-                break;
+                break;            //On arrête la premiere boucle pour ranger une tache en station
             }
         }
-        for (int i = 0; i < wagon->nbstat; i++) {   //Pour chaque station, donc on doit creer au moins une station avant
+        for (int i = 0; i < wagon->nbstat; i++) {   //Pour chaque station
             tempsrestant = wagon->tempsmax - wagon->chaine[i].tempsactuel; //On vérifie le temps restant de la station
             int X = 0;
             float max = 0;
@@ -224,7 +224,7 @@ void tri_precedence (chain* wagon, taches* listetaches) {
                         }
                         else
                         {
-                            /*Chercher dans la station i et avant s'il y a tout les predecesseurs
+                            /*Chercher dans la station i et celle(s) d'avant s'il y a tout les predecesseurs de la tache
                              * Boucle sur les taches de chaque station et chaque predecesseur, si les ID correspondent, on valide pour ce predecesseur
                              * */
                             int validPred = 0;
@@ -250,7 +250,7 @@ void tri_precedence (chain* wagon, taches* listetaches) {
             }
             if(change == 1)
             {
-                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station
+                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station et éviter de le remettre dans une station
                 wagon->chaine[i].tabstat[wagon->chaine[i].nbtask] = listetemp->taches[X];       //On l'ajoute
                 wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses taches
                 wagon->chaine[i].nbtask++;
@@ -265,6 +265,7 @@ void tri_precedence (chain* wagon, taches* listetaches) {
             wagon->nbstat++;
         }
     }
+    printf("Precedences/Temps effectuees\n");
 }
 
 taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
@@ -287,11 +288,11 @@ taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes
     return tabtask;
 }
 
-void exclusion(taches* tabtask,chain* ws)
+void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartition en stations en fonction de conditions d'exclusions de tâches
 {
     int validExclu, nbColorees = 0, couleur = 0;
     taches* listetemp = (taches*) malloc(sizeof(taches));
-    listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
+    listetemp->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);           //Liste temporaire
     listetemp->nbtaches = 0;
     tabtask = tri_a_bulle(tabtask);
     while(nbColorees < tabtask->nbtaches)                     //Tant que toutes les taches pas colorées
@@ -334,7 +335,7 @@ void exclusion(taches* tabtask,chain* ws)
             }
         }
     }
-    for (int i = 0; i < couleur; i++) {
+    for (int i = 0; i < couleur; i++) {            //Pour toutes les couleurs trouvées, on creer une station dans la chaine
         taches* listetempbis = (taches*) malloc(sizeof(taches));
         listetempbis->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
         listetempbis->nbtaches = 0;
@@ -352,7 +353,7 @@ void exclusion(taches* tabtask,chain* ws)
     }
     ws->nbstat = couleur;
     free(listetemp);
-    printf("exclusions effectuees\n");
+    printf("Exclusions effectuees\n");
 }
 
 int main() {
