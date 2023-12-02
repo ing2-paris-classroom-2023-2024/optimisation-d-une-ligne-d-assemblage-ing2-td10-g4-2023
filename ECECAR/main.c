@@ -253,8 +253,7 @@ void exclusion(taches* tabtask,chain* ws)
 }
 
 int main() {
-
-    int couleur;
+    
     chain* ws = (chain*) malloc(sizeof(chain));
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
