@@ -475,8 +475,9 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                     change = 1;
                                 }
                             }
-                            else
-                            {
+                            else {
+
+                                    // Les deux conditions sont remplies
                                 /*Les 2 contraintes des deux if d'au dessus*/
                                 /*
                                  * chaine -> tableau de stations
@@ -484,6 +485,40 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                  * listetemp->taches -> un tableau de tache
                                  * listetemp->taches[j] -> Une tache précise à position j
                                  * */
+
+
+                                int DerStation = 0;
+                                validpred = 0;
+                                validexclu = 0;
+
+
+                                for (int k = 0; k < i + 1; k++) {
+                                    for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
+
+                                        for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
+                                            if (wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID) {
+                                                validpred++;
+                                            }
+                                        }
+
+
+                                        if (k == i && validpred == listetemp->taches[j].nbpred) {
+                                            DerStation = 1;
+                                            for (int n = 0; n < listetemp->taches[j].nbexclu; n++) {
+                                                if (wagon->chaine[i].tabstat[l].ID == listetemp->taches[j].exclu[n].ID) {
+                                                    validexclu = 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (DerStation && validpred == listetemp->taches[j].nbpred && validexclu == 0) {
+                                    X = j;
+                                    max = listetemp->taches[j].temps;
+                                    change = 1;
+                                }
                             }
                         }
                     }
@@ -517,90 +552,7 @@ int main() {
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
-    ///CODE PRECEDENCE / TEMPS
-
-    /*
-     * Cherchez à prendre en compte les contraintes de précédence et de temps de cycle.
-     * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
-     * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
-     * */
-
-    tri_precedence (ws, tabtask);
-
-    ///AFFICHAGE PRECEDENCE / TEMPS
-    for (int i = 0; i < ws->nbstat - 1; i++) {
-        printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
-        printf("Taches : ");
-        for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
-            printf("%d",ws->chaine[i].tabstat[j].ID);
-            if (j < ws->chaine[i].nbtask - 1) {
-                printf(", ");
-            }
-            else printf("\n\n");
-        }
-    }
-
-    ///CODE EXCLUSION
-
-    exclusion(tabtask, ws);
-
-    /*
-     * Cherchez à répondre à la contrainte d'exclusion,
-     * sans prendre en compte les autres contraintes
-     * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
-     * */
-
-    ///AFFICHAGE EXCLUSION
-    for (int i = 0; i < ws->nbstat; i++) {
-        printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
-        for (int j = 0; j < ws->chaine[i].nbtask; j++) {
-            if(j==0)
-            {
-                printf("   ");
-            }
-            printf("%d",ws->chaine[i].tabstat[j].ID);
-            if(j<ws->chaine[i].nbtask - 1)
-            {
-                printf(", ");
-            }
-            else
-            {
-                printf("\n");
-            }
-        }
-    }
-
-    ws = (chain*) malloc(sizeof(chain));
-    tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
-    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
-    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
-    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
-    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
-
-    ///CODE PRECEDENCE / TEMPS
-
-    /*
-     * Cherchez à prendre en compte les contraintes de précédence et de temps de cycle.
-     * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
-     * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
-     * */
-
-    tri_precedence (ws, tabtask);
-
-    ///AFFICHAGE PRECEDENCE / TEMPS
-    for (int i = 0; i < ws->nbstat - 1; i++) {
-        printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
-        printf("Taches : ");
-        for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
-            printf("%d",ws->chaine[i].tabstat[j].ID);
-            if (j < ws->chaine[i].nbtask - 1) {
-                printf(", ");
-            }
-            else printf("\n");
-        }
-    }
-
-    printf("Romain t'es beau");
+    Assemblage(ws, tabtask);
 
     free(tabtask);
     free(ws);
