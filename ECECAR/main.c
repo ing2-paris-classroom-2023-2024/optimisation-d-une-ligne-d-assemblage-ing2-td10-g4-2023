@@ -601,7 +601,6 @@ int main() {
         }
     }
 
-
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
@@ -623,6 +622,7 @@ int main() {
             }
         }
     }
+
 
     free(tabtask);
     free(ws);
