@@ -543,7 +543,97 @@ int main() {
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
+    ///CODE PRECEDENCE / TEMPS
+
+    /*
+     * Cherchez à prendre en compte les contraintes de précédence et de temps de cycle.
+     * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
+     * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
+     * */
+
+    tri_precedence (ws, tabtask);
+
+    ///AFFICHAGE PRECEDENCE / TEMPS
+    for (int i = 0; i < ws->nbstat; i++) {
+        if(ws->chaine[i].tempsactuel>0)
+        {
+            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            printf("Taches : ");
+            for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
+                printf("%d",ws->chaine[i].tabstat[j].ID);
+                if (j < ws->chaine[i].nbtask - 1) {
+                    printf(", ");
+                }
+                else printf("\n\n");
+            }
+        }
+    }
+
+
+    ws = (chain*) malloc(sizeof(chain));
+    tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
+    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
+    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
+    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
+
+
+
+    ///CODE EXCLUSION
+
+    exclusion(tabtask, ws);
+
+    /*
+     * Cherchez à répondre à la contrainte d'exclusion,
+     * sans prendre en compte les autres contraintes
+     * et proposez une répartition des opérations par station en fonction de cette contrainte seule.
+     * */
+
+    ///AFFICHAGE EXCLUSION
+    for (int i = 0; i < ws->nbstat; i++) {
+        printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
+        for (int j = 0; j < ws->chaine[i].nbtask; j++) {
+            if(j==0)
+            {
+                printf("   ");
+            }
+            printf("%d",ws->chaine[i].tabstat[j].ID);
+            if(j<ws->chaine[i].nbtask - 1)
+            {
+                printf(", ");
+            }
+            else
+            {
+                printf("\n");
+            }
+        }
+    }
+
+
+
+    ws = (chain*) malloc(sizeof(chain));
+    tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
+    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
+    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
+    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
+
     Assemblage(ws, tabtask);
+    ///AFFICHAGE PRECEDENCE / TEMPS
+    for (int i = 0; i < ws->nbstat; i++) {
+        if(ws->chaine[i].tempsactuel>0)
+        {
+            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            printf("Taches : ");
+            for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
+                printf("%d",ws->chaine[i].tabstat[j].ID);
+                if (j < ws->chaine[i].nbtask - 1) {
+                    printf(", ");
+                }
+                else printf("\n\n");
+            }
+        }
+    }
 
     free(tabtask);
     free(ws);
