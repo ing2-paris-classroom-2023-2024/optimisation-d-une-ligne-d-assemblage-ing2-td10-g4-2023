@@ -383,7 +383,7 @@ int main() {
             if (j < ws->chaine[i].nbtask - 1) {
                 printf(", ");
             }
-            else printf("\n\ns");
+            else printf("\n\n");
         }
     }
 
