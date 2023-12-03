@@ -417,23 +417,12 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                         }
                         else
                         {
-                            /*Si les 2 ne sont pas à 0 (chiant)
-                             * Si exclu = 0 (que pred (deja fait))
-                             * Si pred = 0  (que exclu)
-                             * */
-                            /*Chercher dans la station i et celle(s) d'avant s'il y a tout les predecesseurs de la tache
-                             * Boucle sur les taches de chaque station et chaque predecesseur, si les ID correspondent, on valide pour ce predecesseur
-                             * */
                             if(listetemp->taches[j].nbpred==0)
                             {
-                                /*Que exclu*/
-                                /*
-                                 * Parcours LES TACHES de LA station actuelle uniquement
-                                 * Si on y trouve un exclu, on arrête
-                                 * */
                                 validexclu = 0;
-                                for (int k = 0; k < wagon->chaine[i].nbtask; k++) {        //Boucle sur les exclus
-                                    for (int l = 0; l < listetemp->taches[j].nbexclu; l++) {
+                                validpred = listetemp->taches[j].nbpred;
+                                for (int l = 0; l < listetemp->taches[j].nbexclu; l++) {    //Si nbexclu = 0, validexclu reste à 0 (validé)
+                                    for (int k = 0; k < wagon->chaine[i].nbtask; k++) {        //Boucle sur les exclus
                                         if (wagon->chaine[i].tabstat[k].ID == listetemp->taches[j].exclu[l].ID)
                                         {                    // Si on trouve un seul exclu dans listetemp
                                             validexclu = 1;
@@ -444,65 +433,57 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                         break;
                                     }
                                 }
-                                if(validexclu == 0)
-                                {
-                                    X = j;
-                                    max = listetemp->taches[j].temps;
-                                    change = 1;
-                                }
-
                             }
-                            else if(listetemp->taches[j].nbexclu==0)
+                            if(listetemp->taches[j].nbexclu==0)
                             {
-                                /*Que pred*/
-                                int validPred = 0;
-                                for (int k = 0; k < i+1; k++) {
-                                    for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
-                                        for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
+                                validpred = 0;
+                                validexclu = 0;
+                                for (int m = 0; m < listetemp->taches[j].nbpred; m++) {     //Si nbpred = 0, validpred reste = nbpred(validé)
+                                    for (int k = 0; k < i+1; k++) {
+                                        for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
                                             if(wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID)
                                             {
-                                                validPred++;
+                                                validpred++;
                                             }
                                         }
                                     }
                                 }
-                                if(validPred == listetemp->taches[j].nbpred) //Si tout les predecesseurs sont bien dans une station precedentes on enregistre l'index et le temps de la tache
-                                {
-                                    X = j;
-                                    max = listetemp->taches[j].temps;
-                                    change = 1;
-                                }
                             }
-                            // Si la tache a des exclus et des précédences
-                            else{
-
-                                validpred = 0;
+                            if(listetemp->taches[j].nbpred!=0 && listetemp->taches[j].nbexclu!=0)
+                            {
                                 validexclu = 0;
-                                for (int k = 0; k < i + 1; k++) {
-                                    for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
-                                        // Vérifier la précedence
-                                        for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
+                                validpred = 0;
+                                for (int k = 0; k < i+1; k++) {                     //Parcours chaque station jusqu'a l'actuelle
+                                    for (int l = 0; l < wagon->chaine[k].nbtask; l++) { //Chaque tache de la station
+                                        for (int m = 0; m < listetemp->taches[j].nbpred; m++) {         //Chaque predecesseur
                                             if (wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID) {
                                                 validpred++;
                                             }
                                         }
-                                        // Si c'est la dernière station, vérifier les exclusions
-                                        if (k == i && validpred == listetemp->taches[j].nbpred) {
-                                            for (int n = 0; n < listetemp->taches[j].nbexclu; n++) {
-                                                if (wagon->chaine[i].tabstat[l].ID == listetemp->taches[j].exclu[n].ID) {
+                                        if(k==i)
+                                        {
+                                            for (int m = 0; m < listetemp->taches[j].nbexclu; m++) {
+                                                if (wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].exclu[m].ID)
+                                                {                    // Si on trouve un seul exclu dans listetemp
                                                     validexclu = 1;
                                                     break;
                                                 }
                                             }
+                                            if (validexclu == 1) {
+                                                break;
+                                            }
                                         }
                                     }
+                                    if (validexclu == 1) {
+                                        break;
+                                    }
                                 }
-                                //Si toutes les contraintes sont respectées alors on sauvegarde cette tâche
-                                if (validpred == listetemp->taches[j].nbpred && validexclu == 0) {
-                                    X = j;
-                                    max = listetemp->taches[j].temps;
-                                    change = 1;
-                                }
+                            }
+                            if((validpred ==  listetemp->taches[j].nbpred) && (validexclu == 0)) //Si tout les predecesseurs sont bien dans une station precedentes on enregistre l'index et le temps de la tache
+                            {
+                                X = j;
+                                max = listetemp->taches[j].temps;
+                                change = 1;
                             }
                         }
                     }
