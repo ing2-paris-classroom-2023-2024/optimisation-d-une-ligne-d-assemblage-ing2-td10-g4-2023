@@ -529,14 +529,17 @@ int main() {
 
     ///AFFICHAGE PRECEDENCE / TEMPS
     for (int i = 0; i < ws->nbstat; i++) {
-        printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
-        printf("Taches : ");
-        for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
-            printf("%d",ws->chaine[i].tabstat[j].ID);
-            if (j < ws->chaine[i].nbtask - 1) {
-                printf(", ");
+        if(ws->chaine[i].tempsactuel>0)
+        {
+            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            printf("Taches : ");
+            for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
+                printf("%d",ws->chaine[i].tabstat[j].ID);
+                if (j < ws->chaine[i].nbtask - 1) {
+                    printf(", ");
+                }
+                else printf("\n\n");
             }
-            else printf("\n\n");
         }
     }
 
