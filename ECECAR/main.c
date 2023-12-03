@@ -25,7 +25,7 @@ int compteLignes(char* nom)         ///Fonction de récupération du nombre de l
             carac2 = carac;
         }
 
-        if(carac2 != '\n')                            // Ici, c2 est égal au caractère juste avant le EOF (end of file). Si le dernier caractère n'est pas un \n on rajoute 1 au nombre de ligne
+        if(carac2 != '\n')                            // Ici, c2 est égal au caractère juste avant le EOF (end of file). Si le dernier caractère n'est pas un \n on rajoute 1 au nombre de lignes
         {
             nbL++;                                   // Dernière ligne non finie
         }
@@ -167,7 +167,7 @@ chain* init_chaine(char* file_name, taches* g,chain* ws)                        
 void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de répartition en stations en fonction de conditions de précedence et de temps
     taches *listetemp = (taches *) malloc(sizeof(taches));		//Liste temporaire de taches
     listetemp->taches = (task *) malloc(sizeof(task) * listetaches->nbtaches);
-    int compteurtaches = 0, change = 0, validpred = 0;
+    int compteurtaches = 0, change = 0, validpred;
     float tempsrestant;
     listetemp->nbtaches = 0;
     while (compteurtaches < listetaches->nbtaches) {            ///Tant que toutes les taches n'ont pas été mises en station
@@ -175,7 +175,7 @@ void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de
             if (listetaches->taches[i].marque !=1){             //Si la couleur n'est pas déjà dans la liste temporaire
                 if (listetaches->taches[i].nbpred == 0) {                         //Et qu'elle n'a pas de prédecesseurs
                     listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];        //Ajout de la tache dans la liste temporaire
-                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas en station
+                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas en station.
                     listetemp->nbtaches++;
                 }
                 else {                                                                     // Si elle a un ou plusieurs predecesseurs
@@ -189,13 +189,13 @@ void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de
                                 }
                             }
                         }
-                        if (validpred == 1) {            //On arrete la deuxieme boucle
+                        if (validpred == 1) {            //On arrête la deuxieme boucle
                             break;
                         }
                         if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été mis en station, alors on ajoute la tache à notre liste temporaire
                         {
                             listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
-                            listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
+                            listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe.
                             listetemp->nbtaches++;
 
                         }
@@ -250,15 +250,15 @@ void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de
             }
             if(change == 1)
             {
-                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station et éviter de le remettre dans une station
+                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station et éviter de le remettre dans une station.
                 wagon->chaine[i].tabstat[wagon->chaine[i].nbtask] = listetemp->taches[X];       //On l'ajoute
-                wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses taches
+                wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses tâches
                 wagon->chaine[i].nbtask++;
                 compteurtaches++;
                 break;
             }
         }
-        if(change == 0)             //Si on a pas réussi à inserer une tache dans une station, on en creer une nouvelle.
+        if(change == 0)             //Si on n'a pas réussi à inserer une tache dans une station, on en creer une nouvelle.
         {
             wagon->chaine[wagon->nbstat].tempsactuel = 0;
             wagon->chaine[wagon->nbstat].rang = wagon->nbstat;
@@ -306,13 +306,13 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
                 nbColorees++;
                 for(int j = 0; j < tabtask->nbtaches; j++)      //Boucle sur toutes les taches
                 {
-                   if(tabtask->taches[j].couleur == 0){
+                    if(tabtask->taches[j].couleur == 0){
                         validExclu = 0;
                         for (int k = 0; k < tabtask->taches[j].nbexclu; k++) {        //Boucle sur les exclus
                             for (int l = 0; l < listetemp->nbtaches; l++) {
                                 if (listetemp->taches[l].ID == tabtask->taches[j].exclu[k].ID)
                                 {                    // Si on trouve un seul exclu dans listetemp on vérifie sa couleur
-                                    if (listetemp->taches[l].couleur == couleur)//Si l exclue est de la couleur actuelle
+                                    if (listetemp->taches[l].couleur == couleur)//Si l'exclue est de la couleur actuelle
                                     {
                                         validExclu = 1;
                                         break;
@@ -329,13 +329,13 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
                             listetemp->nbtaches++;
                             nbColorees++;
                         }
-                   }
+                    }
                 }
                 break;
             }
         }
     }
-    for (int i = 0; i < couleur; i++) {            //Pour toutes les couleurs trouvées, on creer une station dans la chaine
+    for (int i = 0; i < couleur; i++) {            //Pour toutes les couleurs trouvées, on crée une station dans la chaine
         taches* listetempbis = (taches*) malloc(sizeof(taches));
         listetempbis->taches = (task*) malloc(sizeof(task)*tabtask->nbtaches);
         listetempbis->nbtaches = 0;
@@ -359,7 +359,7 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
 void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de répartition en stations en fonction de conditions de précedence et de temps
     taches *listetemp = (taches *) malloc(sizeof(taches));		//Liste temporaire de taches
     listetemp->taches = (task *) malloc(sizeof(task) * listetaches->nbtaches);
-    int compteurtaches = 0, change = 0, validpred = 0, validexclu = 0;
+    int compteurtaches = 0, change = 0, validpred, validexclu;
     float tempsrestant;
     listetemp->nbtaches = 0;
     while (compteurtaches < listetaches->nbtaches) {            ///Tant que toutes les taches n'ont pas été mises en station
@@ -367,7 +367,7 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
             if (listetaches->taches[i].marque !=1){             //Si la couleur n'est pas déjà dans la liste temporaire
                 if (listetaches->taches[i].nbpred == 0) {                         //Et qu'elle n'a pas de prédecesseurs
                     listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];        //Ajout de la tache dans la liste temporaire
-                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas en station
+                    listetaches->taches[i].marque = 1;      //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas en station.
                     listetemp->nbtaches++;
                 }
                 else {                                                                     // Si elle a un ou plusieurs predecesseurs
@@ -381,13 +381,13 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                 }
                             }
                         }
-                        if (validpred == 1) {            //On arrete la deuxieme boucle
+                        if (validpred == 1) {            //On arrête la deuxieme boucle
                             break;
                         }
                         if(listetaches->taches[i].nbpred-1 == j)        //Si on arrive ici, tout les predecesseurs ont été mis en station, alors on ajoute la tache à notre liste temporaire
                         {
                             listetemp->taches[listetemp->nbtaches] = listetaches->taches[i];
-                            listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe
+                            listetaches->taches[i].marque = 1;                   //On marque la tache dans le graphe de base pour dire qu'elle est présente dans la liste, mais pas dans le graphe.
                             listetemp->nbtaches++;
 
                         }
@@ -431,7 +431,7 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                 /*Que exclu*/
                                 /*
                                  * Parcours LES TACHES de LA station actuelle uniquement
-                                 * Si on y trouve un exclu on arrête
+                                 * Si on y trouve un exclu, on arrête
                                  * */
                                 validexclu = 0;
                                 for (int k = 0; k < wagon->chaine[i].nbtask; k++) {        //Boucle sur les exclus
@@ -475,15 +475,36 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                     change = 1;
                                 }
                             }
-                            else
-                            {
-                                /*Les 2 contraintes des deux if d'au dessus*/
-                                /*
-                                 * chaine -> tableau de stations
-                                 * chaine[i] -> Une station a position i
-                                 * listetemp->taches -> un tableau de tache
-                                 * listetemp->taches[j] -> Une tache précise à position j
-                                 * */
+                            // Si la tache a des exclus et des précédences
+                            else{
+
+                                validpred = 0;
+                                validexclu = 0;
+                                for (int k = 0; k < i + 1; k++) {
+                                    for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
+                                        // Vérifier la précedence
+                                        for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
+                                            if (wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID) {
+                                                validpred++;
+                                            }
+                                        }
+                                        // Si c'est la dernière station, vérifier les exclusions
+                                        if (k == i && validpred == listetemp->taches[j].nbpred) {
+                                            for (int n = 0; n < listetemp->taches[j].nbexclu; n++) {
+                                                if (wagon->chaine[i].tabstat[l].ID == listetemp->taches[j].exclu[n].ID) {
+                                                    validexclu = 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                //Si toutes les contraintes sont respectées alors on sauvegarde cette tâche
+                                if (validpred == listetemp->taches[j].nbpred && validexclu == 0) {
+                                    X = j;
+                                    max = listetemp->taches[j].temps;
+                                    change = 1;
+                                }
                             }
                         }
                     }
@@ -491,15 +512,15 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
             }
             if(change == 1)
             {
-                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station et éviter de le remettre dans une station
+                listetemp->taches[X].marque = 1;                //On marque le sommet dans la liste pour signifier qu'il est dans une station et éviter de le remettre dans une station.
                 wagon->chaine[i].tabstat[wagon->chaine[i].nbtask] = listetemp->taches[X];       //On l'ajoute
-                wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses taches
+                wagon->chaine[i].tempsactuel += listetemp->taches[X].temps;                     //Et on augmente le temps actuel que la station met à effectuer toutes ses tâches
                 wagon->chaine[i].nbtask++;
                 compteurtaches++;
                 break;
             }
         }
-        if(change == 0)             //Si on a pas réussi à inserer une tache dans une station, on en creer une nouvelle.
+        if(change == 0)             //Si on n'a pas réussi à inserer une tache dans une station, on en creer une nouvelle.
         {
             wagon->chaine[wagon->nbstat].tempsactuel = 0;
             wagon->chaine[wagon->nbstat].rang = wagon->nbstat;
@@ -510,7 +531,8 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
 }
 
 int main() {
-    chain* ws = (chain*) malloc(sizeof(chain));
+
+    chain* ws = (chain*) malloc(sizeof(chain));            //Initialise "ws", une chaine de toutes les stations
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
@@ -522,7 +544,7 @@ int main() {
     /*
      * Cherchez à prendre en compte les contraintes de précédence et de temps de cycle.
      * En effet, prendre en compte uniquement les contraintes de précédence est trop simpliste :
-     * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station, et le tour est joué !
+     * si le temps de cycle est infini il suffit d'affecter toutes les opérations sur une seule station et le tour est joué !
      * */
 
     tri_precedence (ws, tabtask);
@@ -543,16 +565,10 @@ int main() {
         }
     }
 
-    free(ws);
-    free(tabtask);
-
-    ws = (chain*) malloc(sizeof(chain));
-    tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
-
 
 
     ///CODE EXCLUSION
@@ -580,10 +596,33 @@ int main() {
             }
             else
             {
-                printf("\n");
+                printf("\n\n");
             }
         }
     }
+
+    init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
+    init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
+    init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
+    ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
+
+    Assemblage(ws, tabtask);
+    ///AFFICHAGE ASSEMBLAGE
+    for (int i = 0; i < ws->nbstat; i++) {
+        if(ws->chaine[i].tempsactuel>0)
+        {
+            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            printf("Taches : ");
+            for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
+                printf("%d",ws->chaine[i].tabstat[j].ID);
+                if (j < ws->chaine[i].nbtask - 1) {
+                    printf(", ");
+                }
+                else printf("\n\n");
+            }
+        }
+    }
+
 
     free(tabtask);
     free(ws);
