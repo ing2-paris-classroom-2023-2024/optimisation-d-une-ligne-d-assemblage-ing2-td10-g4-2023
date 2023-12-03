@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/F530/CLionProjects/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR
+# Install script for directory: C:/Users/romai/Documents/GitHub/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/F530/CLionProjects/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/romai/Documents/GitHub/optimisation-d-une-ligne-d-assemblage-ing2-td10-g4-2023/ECECAR/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

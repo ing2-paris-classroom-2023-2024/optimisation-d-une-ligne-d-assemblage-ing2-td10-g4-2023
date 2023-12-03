@@ -265,7 +265,7 @@ void tri_precedence (chain* wagon, taches* listetaches) {         ///Fonction de
             wagon->nbstat++;
         }
     }
-    printf("Precedences/Temps effectuees\n");
+    printf("PRECEDENCE/TEMPS : \n");
 }
 
 taches* tri_a_bulle(taches* tabtask)             /// Fonction de tri des arêtes par ordre croissant de poids
@@ -353,7 +353,7 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
     }
     ws->nbstat = couleur;
     free(listetemp);
-    printf("Exclusions effectuees\n");
+    printf("EXCLUSION : \n");
 }
 
 void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de répartition en stations en fonction de conditions de précedence et de temps
@@ -396,8 +396,6 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                 break;            //On arrête la premiere boucle pour ranger une tache en station
             }
         }
-
-        ///CHANGEMENT
         for (int i = 0; i < wagon->nbstat; i++) {   //Pour chaque station
             tempsrestant = wagon->tempsmax - wagon->chaine[i].tempsactuel; //On vérifie le temps restant de la station
             int X = 0;
@@ -527,17 +525,61 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
             wagon->nbstat++;
         }
     }
-    printf("ASSEMBLAGE effectue\n");
+    printf("3 CONTRAINTES :\n");
 }
 
 int main() {
 
+    float TotalTime;
     chain* ws = (chain*) malloc(sizeof(chain));            //Initialise "ws", une chaine de toutes les stations
     taches* tabtask=(taches*)malloc(sizeof(taches));       //Initialise "tabtask", un tableau de toutes les taches
     init_taches("operations.txt", tabtask);         // Fonction de remplissage d'un tableau de taches avec leurs temps et identifiants
     init_pred("precedences.txt", tabtask);          // Fonction de remplissage des predecesseurs de chaque tache
     init_exclu("exclusions.txt", tabtask);          // Fonction de remplissage des exclusions pour chaque tache
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
+
+
+    ///AFFICHAGE TACHES ET TEMPS
+    ///AFFICHAGE PRECEDENCE ET EXCLUSION
+
+    printf("\n-----/TACHES/-----\n");
+    for (int i = 0; i < tabtask->nbtaches; i++) {
+        printf("\n%d) Tache : %d Temps : %.2f\n      %d Precedence(s) : ",i+1,tabtask->taches[i].ID,tabtask->taches[i].temps,tabtask->taches[i].nbpred);
+        for (int j = 0; j < tabtask->taches[i].nbpred; j++) {
+            printf("%d",tabtask->taches[i].pred[j].ID);
+            if(j <tabtask->taches[i].nbpred-1)
+            {
+                printf(", ");
+            }
+            else
+            {
+                printf("\n");
+            }
+        }
+        if(tabtask->taches[i].nbpred == 0)
+        {
+            printf("\n");
+        }
+        printf("      %d Exclusion (s) : ",tabtask->taches[i].nbexclu);
+        for (int j = 0; j < tabtask->taches[i].nbexclu; j++) {
+            printf("%d",tabtask->taches[i].exclu[j].ID);
+            if(j <tabtask->taches[i].nbexclu-1)
+            {
+                printf(", ");
+            }
+            else
+            {
+                printf("\n");
+            }
+        }
+        if(tabtask->taches[i].nbexclu == 0)
+        {
+            printf("\n");
+        }
+    }
+
+    ///AFFICHAGE TEMPS
+    printf("\n-----/STATION/-----\nTemps de cycle maximum par station : %.2f\n\n",ws->tempsmax);
 
     ///CODE PRECEDENCE / TEMPS
 
@@ -553,7 +595,7 @@ int main() {
     for (int i = 0; i < ws->nbstat; i++) {
         if(ws->chaine[i].tempsactuel>0)
         {
-            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            printf("%d ) Station %d / Nombre de taches dans la station %d / Temps total de la station : %.2f :\n",i+1,ws->chaine[i].rang+1,ws->chaine[i].nbtask, ws->chaine[i].tempsactuel);
             printf("Taches : ");
             for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
                 printf("%d",ws->chaine[i].tabstat[j].ID);
@@ -583,7 +625,7 @@ int main() {
 
     ///AFFICHAGE EXCLUSION
     for (int i = 0; i < ws->nbstat; i++) {
-        printf("%d ) Je suis la station %d avec %d taches :\n",i,ws->chaine[i].rang,ws->chaine[i].nbtask);
+            printf("%d ) Station %d / %d taches :\n",i+1,ws->chaine[i].rang,ws->chaine[i].nbtask);
         for (int j = 0; j < ws->chaine[i].nbtask; j++) {
             if(j==0)
             {
@@ -607,11 +649,13 @@ int main() {
     ws = init_chaine("temps_cycle.txt",tabtask,ws); // Fonction de définition du temps par station
 
     Assemblage(ws, tabtask);
-    ///AFFICHAGE ASSEMBLAGE
+    ///AFFICHAGE MULTICONTRAINTE
+    TotalTime = 0;
     for (int i = 0; i < ws->nbstat; i++) {
         if(ws->chaine[i].tempsactuel>0)
         {
-            printf("%d ) Je suis la station %d, temps actuel : %f :\n",i,ws->chaine[i].rang, ws->chaine[i].tempsactuel);
+            TotalTime += ws->chaine[i].tempsactuel;
+            printf("%d ) Station %d / Nombre de taches dans la station %d / Temps total de la station : %.2f :\n",i+1,ws->chaine[i].rang+1,ws->chaine[i].nbtask, ws->chaine[i].tempsactuel);
             printf("Taches : ");
             for (int j = 0; j < ws->chaine[i].nbtask; ++j) {
                 printf("%d",ws->chaine[i].tabstat[j].ID);
@@ -623,6 +667,7 @@ int main() {
         }
     }
 
+    printf("Temps total de la chaine : %.2f\n",TotalTime);
 
     free(tabtask);
     free(ws);
