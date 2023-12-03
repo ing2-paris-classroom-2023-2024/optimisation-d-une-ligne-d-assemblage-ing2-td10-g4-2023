@@ -306,7 +306,7 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
                 nbColorees++;
                 for(int j = 0; j < tabtask->nbtaches; j++)      //Boucle sur toutes les taches
                 {
-                   if(tabtask->taches[j].couleur == 0){
+                    if(tabtask->taches[j].couleur == 0){
                         validExclu = 0;
                         for (int k = 0; k < tabtask->taches[j].nbexclu; k++) {        //Boucle sur les exclus
                             for (int l = 0; l < listetemp->nbtaches; l++) {
@@ -329,7 +329,7 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
                             listetemp->nbtaches++;
                             nbColorees++;
                         }
-                   }
+                    }
                 }
                 break;
             }
@@ -359,7 +359,7 @@ void exclusion(taches* tabtask,chain* ws)               ///Fonction de répartit
 void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de répartition en stations en fonction de conditions de précedence et de temps
     taches *listetemp = (taches *) malloc(sizeof(taches));		//Liste temporaire de taches
     listetemp->taches = (task *) malloc(sizeof(task) * listetaches->nbtaches);
-    int compteurtaches = 0, change = 0, validpred = 0, validexclu = 0;
+    int compteurtaches = 0, change = 0, validpred, validexclu;
     float tempsrestant;
     listetemp->nbtaches = 0;
     while (compteurtaches < listetaches->nbtaches) {            ///Tant que toutes les taches n'ont pas été mises en station
@@ -475,35 +475,27 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                     change = 1;
                                 }
                             }
-                            else {
+                            else{
 
-                                    // Les deux conditions sont remplies
+                                // Les deux conditions sont remplies
                                 /*Les 2 contraintes des deux if d'au dessus*/
                                 /*
                                  * chaine -> tableau de stations
                                  * chaine[i] -> Une station a position i
                                  * listetemp->taches -> un tableau de tache
                                  * listetemp->taches[j] -> Une tache précise à position j
-                                 * */
+                                 */
 
-
-                                int DerStation = 0;
                                 validpred = 0;
                                 validexclu = 0;
-
-
                                 for (int k = 0; k < i + 1; k++) {
                                     for (int l = 0; l < wagon->chaine[k].nbtask; l++) {
-
                                         for (int m = 0; m < listetemp->taches[j].nbpred; m++) {
                                             if (wagon->chaine[k].tabstat[l].ID == listetemp->taches[j].pred[m].ID) {
                                                 validpred++;
                                             }
                                         }
-
-
                                         if (k == i && validpred == listetemp->taches[j].nbpred) {
-                                            DerStation = 1;
                                             for (int n = 0; n < listetemp->taches[j].nbexclu; n++) {
                                                 if (wagon->chaine[i].tabstat[l].ID == listetemp->taches[j].exclu[n].ID) {
                                                     validexclu = 1;
@@ -513,8 +505,7 @@ void Assemblage (chain* wagon, taches* listetaches) {         ///Fonction de ré
                                         }
                                     }
                                 }
-
-                                if (DerStation && validpred == listetemp->taches[j].nbpred && validexclu == 0) {
+                                if (validpred == listetemp->taches[j].nbpred && validexclu == 0) {
                                     X = j;
                                     max = listetemp->taches[j].temps;
                                     change = 1;
